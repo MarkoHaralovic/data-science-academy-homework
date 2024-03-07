@@ -12,3 +12,5 @@ LEFT JOIN sports.event
 LEFT JOIN sports.sport
          ON toString(sports.event.sport_id) = sports.sport.id
 group by sports.sport.name
+
+-- answer Futsal,48027
