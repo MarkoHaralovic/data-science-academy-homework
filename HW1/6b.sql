@@ -72,7 +72,6 @@ GROUP BY
     mharalovic.daily_user_activity.geo_country;
 
 --may
-INSERT INTO mharalovic.daily_event_activity
 SELECT
     mharalovic.daily_user_activity.event_date,
     mharalovic.daily_user_activity.geo_country,
@@ -83,7 +82,8 @@ FROM mharalovic.daily_user_activity
 WHERE mharalovic.daily_user_activity.event_date BETWEEN '2023-05-01' AND '2023-05-31'
 GROUP BY
     mharalovic.daily_user_activity.event_date,
-    mharalovic.daily_user_activity
+    mharalovic.daily_user_activity.platform,
+    mharalovic.daily_user_activity.geo_country;
 
 --june
 INSERT INTO mharalovic.daily_event_activity
@@ -238,7 +238,7 @@ GROUP BY event_date;
 
 INSERT INTO mharalovic.monthly_event_activity
 SELECT
-    toStartOfMonth(event_date) as start_of_month,
+    start_of_month,
     geo_country,
     '<all>' as platform,
     SUM(event_count) AS monthly_event_count,
@@ -248,7 +248,7 @@ GROUP BY start_of_month, geo_country;
 
 INSERT INTO mharalovic.monthly_event_activity
 SELECT
-    toStartOfMonth(event_date) as start_of_month,
+    start_of_month,
     '<all>' as geo_country,
     platform,
     SUM(event_count) AS monthly_event_count,
@@ -258,7 +258,7 @@ GROUP BY start_of_month, platform;
 
 INSERT INTO mharalovic.monthly_event_activity
 SELECT
-    toStartOfMonth(event_date) as start_of_month,
+    start_of_month,
     '<all>' as geo_country,
     '<all>' as platform,
     SUM(event_count) AS monthly_event_count,
