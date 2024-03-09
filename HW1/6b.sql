@@ -8,7 +8,7 @@ CREATE TABLE mharalovic.daily_event_activity (
 )
 ENGINE = MergeTree
 PARTITION BY toYYYYMM(event_date)
-ORDER BY (event_date, platform)
+ORDER BY (event_date,platform, geo_country, event_name)
 SETTINGS index_granularity = 8192;
 
 --populating daily_event_activity
@@ -231,27 +231,30 @@ GROUP BY
     mharalovic.monthly_user_activity.event_name;
 
 ----------------- adding <all> into tables on daily basis ----------------
-INSERT INTO mharalovic.daily_event_activity
-SELECT
-    event_date,
-    event_name,
-    geo_country,
-    '<all>' as platform,
-    SUM(event_count) AS daily_event_count,
-    COUNT(DISTINCT user_pseudo_id) AS user_count
-FROM mharalovic.daily_user_activity
-GROUP BY event_date, event_name, geo_country;
 
-INSERT INTO mharalovic.daily_event_activity
-SELECT
-    event_date,
-    event_name,
-    '<all>' as geo_country,
-    platform,
-    SUM(event_count) AS daily_event_count,
-    COUNT(DISTINCT user_pseudo_id) AS user_count
-FROM mharalovic.daily_user_activity
-GROUP BY event_date, event_name, platform;
+--runtime error
+-- INSERT INTO mharalovic.daily_event_activity
+-- SELECT
+--     event_date,
+--     event_name,
+--     geo_country,
+--     '<all>' as platform,
+--     SUM(event_count) AS daily_event_count,
+--     COUNT(DISTINCT user_pseudo_id) AS user_count
+-- FROM mharalovic.daily_user_activity
+-- GROUP BY event_date,geo_country, event_name;
+
+--runtime error
+-- INSERT INTO mharalovic.daily_event_activity
+-- SELECT
+--     event_date,
+--     event_name,
+--     '<all>' as geo_country,
+--     platform,
+--     SUM(event_count) AS daily_event_count,
+--     COUNT(DISTINCT user_pseudo_id) AS user_count
+-- FROM mharalovic.daily_user_activity
+-- GROUP BY event_date, platform, event_name;
 
 INSERT INTO mharalovic.daily_event_activity
 SELECT
@@ -264,27 +267,28 @@ SELECT
 FROM mharalovic.daily_user_activity
 GROUP BY event_date, geo_country, platform;
 
-INSERT INTO mharalovic.daily_event_activity
-SELECT
-    event_date,
-    event_name,
-    '<all>' as geo_country,
-    '<all>' as platform,
-    SUM(event_count) AS daily_event_count,
-    COUNT(DISTINCT user_pseudo_id) AS user_count
-FROM mharalovic.daily_user_activity
-GROUP BY event_date, event_name;
+--runtime error 
+-- INSERT INTO mharalovic.daily_event_activity
+-- SELECT
+--     event_date,
+--     event_name,
+--     '<all>' as geo_country,
+--     '<all>' as platform,
+--     SUM(event_count) AS daily_event_count,
+--     COUNT(DISTINCT user_pseudo_id) AS user_count
+-- FROM mharalovic.daily_user_activity
+-- GROUP BY event_date, event_name;
 
 INSERT INTO mharalovic.daily_event_activity
-SELECT
-    event_date,
-    '<all>' as event_name,
-    geo_country,
-    '<all>' as platform,
-    SUM(event_count) AS daily_event_count,
-    COUNT(DISTINCT user_pseudo_id) AS user_count
-FROM mharalovic.daily_user_activity
-GROUP BY event_date, geo_country;
+    SELECT
+        event_date,
+        '<all>' as event_name,
+        geo_country,
+        '<all>' as platform,
+        SUM(event_count) AS daily_event_count,
+        COUNT(DISTINCT user_pseudo_id) AS user_count
+    FROM mharalovic.daily_user_activity
+    GROUP BY event_date, geo_country;
 
 INSERT INTO mharalovic.daily_event_activity
 SELECT
@@ -309,11 +313,10 @@ FROM mharalovic.daily_user_activity
 GROUP BY event_date;
 
 ----------------- adding <all> into tables on monthly basis ----------------
-
 INSERT INTO mharalovic.monthly_event_activity
 SELECT
     start_of_month,
-    event_name
+    event_name,
     geo_country,
     '<all>' as platform,
     SUM(event_count) AS monthly_event_count,
@@ -324,7 +327,7 @@ GROUP BY start_of_month, geo_country,event_name;
 INSERT INTO mharalovic.monthly_event_activity
 SELECT
     start_of_month,
-    event_name
+    event_name,
     '<all>' as  geo_country,
     platform,
     SUM(event_count) AS monthly_event_count,
@@ -335,7 +338,7 @@ GROUP BY start_of_month, platform,event_name;
 INSERT INTO mharalovic.monthly_event_activity
 SELECT
     start_of_month,
-    '<all>' as  event_name
+    '<all>' as  event_name,
     geo_country,
     platform,
     SUM(event_count) AS monthly_event_count,
@@ -347,7 +350,7 @@ GROUP BY start_of_month, platform,geo_country;
 INSERT INTO mharalovic.monthly_event_activity
 SELECT
     start_of_month,
-    event_name
+    event_name,
     '<all>' as geo_country,
     '<all>' as platform,
     SUM(event_count) AS monthly_event_count,
@@ -355,11 +358,10 @@ SELECT
 FROM mharalovic.monthly_user_activity
 GROUP BY start_of_month, event_name;
 
-
 INSERT INTO mharalovic.monthly_event_activity
 SELECT
     start_of_month,
-    '<all>' as event_name
+    '<all>' as event_name,
     geo_country,
     '<all>' as platform,
     SUM(event_count) AS monthly_event_count,
@@ -370,7 +372,7 @@ GROUP BY start_of_month, geo_country;
 INSERT INTO mharalovic.monthly_event_activity
 SELECT
     start_of_month,
-    '<all>' as event_name
+    '<all>' as event_name,
     '<all>' as geo_country,
     platform,
     SUM(event_count) AS monthly_event_count,
@@ -378,11 +380,10 @@ SELECT
 FROM mharalovic.monthly_user_activity
 GROUP BY start_of_month, platform;
 
-
 INSERT INTO mharalovic.monthly_event_activity
 SELECT
     start_of_month,
-    '<all>' as event_name
+    '<all>' as event_name,
     '<all>' as geo_country,
     '<all>' as platform,
     SUM(event_count) AS monthly_event_count,
