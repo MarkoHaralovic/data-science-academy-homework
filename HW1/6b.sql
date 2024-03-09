@@ -8,7 +8,7 @@ CREATE TABLE mharalovic.daily_event_activity (
 )
 ENGINE = MergeTree
 PARTITION BY toYYYYMM(event_date)
-ORDER BY (event_date, geo_country, platform,event_name)
+ORDER BY (event_date, platform)
 SETTINGS index_granularity = 8192;
 
 --populating daily_event_activity
@@ -125,7 +125,7 @@ CREATE TABLE mharalovic.monthly_event_activity (
 )
 ENGINE = MergeTree
 PARTITION BY start_of_month
-ORDER BY (start_of_month, geo_country, platform,event_name)
+ORDER BY (start_of_month,platform)
 SETTINGS index_granularity = 8192;
 
 --january

@@ -8,7 +8,7 @@ CREATE TABLE mharalovic.daily_user_activity (
 )
 ENGINE = MergeTree
 PARTITION BY toYYYYMM(event_date)
-ORDER BY (event_date,user_pseudo_id,platform,geo_country,event_name)
+ORDER BY (event_date,user_pseudo_id,platform)
 SETTINGS index_granularity = 8192;
 
 --january
@@ -99,7 +99,7 @@ CREATE TABLE mharalovic.monthly_user_activity (
 )
 ENGINE = MergeTree
 PARTITION BY start_of_month
-ORDER BY (start_of_month,user_pseudo_id,platform,geo_country,event_name)
+ORDER BY (start_of_month,user_pseudo_id,platform)
 SETTINGS index_granularity = 8192;
 
 --january
