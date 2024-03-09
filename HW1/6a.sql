@@ -1,5 +1,6 @@
 CREATE TABLE mharalovic.daily_user_activity (
     `event_date` Date,
+    `event_name` Date,
     `user_pseudo_id` String,
     `geo_country` LowCardinality(String),
     `platform` ENUM('ANDROID'=1,'IOS'=2,'WEB'=3),
