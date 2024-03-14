@@ -20,9 +20,10 @@ def ssh_download_data_from_dir(remote_folder,local_folder):
          file = file.split(" ")[-1]
          print(file)
          if file.endswith('.zip'):
-            print(file)
-            ssh_download_data(os.path.join(remote_folder,file), os.path.join(local_folder,file), max_tries=3)
-            unzip_file(os.path.join(local_folder,file),local_folder)
+            remote_file_path = os.path.join(remote_folder, file).replace('\\', '/')
+            local_file_path = os.path.join(local_folder, file)
+            ssh_download_data(remote_file_path, local_file_path, max_tries=3)
+            unzip_file(local_file_path, local_folder)
          
 def main():
    logging.basicConfig(level=logging.INFO)
