@@ -7,8 +7,6 @@ import argparse
 import time
 import sys
 
-
-
 def printTotals(transferred, toBeTransferred):
     print(f"Transferred: {transferred}\tOut of: {toBeTransferred}")
 
@@ -30,13 +28,15 @@ def unzip_file(local_file_path,save_path):
    except BadZipFile as e:
       logging.error(f"Error unzipping file on path {local_file_path}")
 
-def open_tar_file(local_file_path,save_path):
-   try:
-      file = tarfile.open(local_file_path)
-      file.extractfile(save_path)
-      file.close()
-   except:
-      logging.error(f"There happened to be a problem extracting tarfile from location {local_file_path}")
+def open_tar_file(local_file_path, save_path):
+    if tarfile.is_tarfile(local_file_path):
+        try:
+            with tarfile.open(local_file_path, 'r:gz') as tar:
+                tar.extractall(path=save_path)
+        except Exception as e: 
+            logging.error(f"There was a problem extracting tar file from location {local_file_path}: {e}")
+    else:
+        logging.error(f"{local_file_path} is not a valid tar file.")
       
 def ssh_download_data(remote_file_path, local_file_path, max_tries=3):
    tries = 0

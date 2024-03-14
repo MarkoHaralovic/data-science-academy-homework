@@ -1,2 +1,3 @@
 #ignore data dir
 /raw_data
+__pycache__
