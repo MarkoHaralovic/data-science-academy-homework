@@ -6,21 +6,33 @@ import argparse
 import time
 import sys
 
-from helper_functions import printTotals,parse_arguments,create_dir,unzip_file,open_tar_file,ssh_download_data 
-      
+from helper_functions import create_dir,parse_arguments,unzip_file,ssh_download_data 
+
+def ssh_download_data_from_dir(remote_folder,local_folder):
+   with paramiko.SSHClient() as ssh:
+      ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+      ssh.connect('130.61.238.15', username='sofascore_academy', password='H69qByfVGwkLgezF')
+      command = f'ls -l {remote_folder}'
+      _, stdout, _ = ssh.exec_command(command)
+      for line in stdout:
+         print(line)
+         file = line.strip()
+         file = file.split(" ")[-1]
+         print(file)
+         if file.endswith('.zip'):
+            print(file)
+            ssh_download_data(os.path.join(remote_folder,file), os.path.join(local_folder,file), max_tries=3)
+            unzip_file(os.path.join(local_folder,file),local_folder)
+         
 def main():
    logging.basicConfig(level=logging.INFO)
    #get paths from cmd line
    save_path, remote_file_path = parse_arguments()
-   #create directory based on provided path (where the person wish to save the data)
-   create_dir(os.path.dirname(save_path))
-   # open ssh session and download data
-   ssh_download_data(remote_file_path, save_path)
-   #extract data from tarfile
-   print(save_path)
-   print(os.path.dirname(save_path))
-   open_tar_file(save_path,os.path.dirname(save_path))
-
+   #create dir where data will be saved
+   create_dir(save_path)
+    # open ssh session and download data
+   ssh_download_data_from_dir(remote_file_path,save_path)
+   
 if __name__ == "__main__":
    main()
-   # EXAMPLE USAGE : python task_1.py --file_save_path './raw_data/february.tar.gz' --remote_file_path '/home/sofascore_academy/l2_dataset/february.tar.gz'
+   # EXAMPLE USAGE : python task_3.py --file_save_path './raw_data/march' --remote_file_path '/home/sofascore_academy/l2_dataset/march'

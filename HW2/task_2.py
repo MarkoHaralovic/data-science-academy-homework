@@ -18,10 +18,8 @@ def main():
    # open ssh session and download data
    ssh_download_data(remote_file_path, save_path)
    #extract data from tarfile
-   print(save_path)
-   print(os.path.dirname(save_path))
    open_tar_file(save_path,os.path.dirname(save_path))
 
 if __name__ == "__main__":
    main()
-   # EXAMPLE USAGE : python task_1.py --file_save_path './raw_data/february.tar.gz' --remote_file_path '/home/sofascore_academy/l2_dataset/february.tar.gz'
+   # EXAMPLE USAGE : python task_2.py --file_save_path './raw_data/february.tar.gz' --remote_file_path '/home/sofascore_academy/l2_dataset/february.tar.gz'
