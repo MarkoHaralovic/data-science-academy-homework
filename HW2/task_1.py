@@ -18,7 +18,7 @@ def parse_arguments():
 
 def create_dir(file_save_dir):
    if not os.path.exists(file_save_dir):
-      os.mkdir(file_save_dir)
+      os.makedirs(file_save_dir)
       
 def unzip_file(local_file_path,save_path):
    try:
