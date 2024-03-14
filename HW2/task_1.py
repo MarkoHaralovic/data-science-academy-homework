@@ -6,7 +6,7 @@ import argparse
 import time
 import sys
 
-from helper_functions import printTotals,parse_arguments,create_dir,unzip_file,open_tar_file,ssh_download_data 
+from helper_functions import printTotals,parse_arguments,create_dir,unzip_file,ssh_download_data 
        
 def main():
    logging.basicConfig(level=logging.INFO)
