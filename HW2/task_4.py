@@ -2,12 +2,12 @@ import pandas
 import os
 import argparse
 import logging
-import sys
 import pandas as pd
-import csv
 from tqdm import tqdm 
 import re
 import numpy as np
+import time
+import sys
 
 def camel_case(s):
     #taken from https://www.w3resource.com/python-exercises/string/python-data-type-string-exercise-96.php
@@ -41,57 +41,63 @@ def search_dir(directory_path):
                     file_paths.append(full_path)
     return file_paths
  
-def merge_data(file_paths,csv_file_path,max_file_size = 1000000000,chunk_size=100000):
+def merge_data(file_paths,csv_file_path,max_file_size = 1000000000,chunk_size=100000, max_tries=3):
    
    camel_case_columns, camel_case_columns_to_select = get_camel_column_names()
    
    processed_data = pd.DataFrame(columns=camel_case_columns)
    processed_data.to_csv(csv_file_path,index=False)
    
-   chunks = []
+   # chunks = []
    for path in tqdm(file_paths,desc="Processing csvs"):
-      if os.stat(path).st_size < max_file_size:
-         print(f" Checked {path}")
-         csv_data = pd.read_csv(path,
-                             header=None,
-                             names=camel_case_columns,
-                             usecols=camel_case_columns_to_select,
-                             on_bad_lines='skip',
-                             #quoting = csv.QUOTE_NONE,#https://stackoverflow.com/questions/18016037/pandas-parsererror-eof-character-when-reading-multiple-csv-files-to-hdf5 
-                             encoding='utf-8',
-                             low_memory=False)
-
-         csv_data.drop_duplicates(keep='first',inplace=True)
-         csv_data['eventDate'] = pd.to_datetime(csv_data['eventDate'], format='%Y%m%d', errors='coerce')
-         csv_data = csv_data.loc[csv_data['eventDate'] <= '2023-03-15']
-         print(csv_data.head())
-         #csv_data.to_csv(csv_file_path,mode='a',index=False,header=False)
-         chunks.append(csv_data)
-      else:
+      tries = 0
+      while tries < max_tries:
          try:
-            df = pd.read_csv(path,
-                             header=None,
-                             names=camel_case_columns,
-                             usecols=camel_case_columns_to_select,
-                             chunksize=chunk_size,
-                             on_bad_lines='skip',
-                            # quoting=csv.QUOTE_NONE, #https://stackoverflow.com/questions/18016037/pandas-parsererror-eof-character-when-reading-multiple-csv-files-to-hdf5 
-                             encoding='utf-8')
-            for chunk in df:
-               chunk.drop_duplicates(keep='first',inplace=True)
-               chunk['eventDate'] = pd.to_datetime(csv_data['eventDate'], format='%Y%m%d', errors='coerce')
-               chunk = chunk.loc[chunk['eventDate'] <= '2023-03-15']
-               #chunk.to_csv(csv_file_path,mode='a',index=False)
-               chunks.append(chunk)
+            if os.stat(path).st_size < max_file_size:
+               print(f" Checked {path}")
+               csv_data = pd.read_csv(path,
+                                 header=None,
+                                 names=camel_case_columns,
+                                 usecols=camel_case_columns_to_select,
+                                 on_bad_lines='skip',
+                                 #quoting = csv.QUOTE_NONE,#https://stackoverflow.com/questions/18016037/pandas-parsererror-eof-character-when-reading-multiple-csv-files-to-hdf5 
+                                 encoding='utf-8',
+                                 low_memory=False)
+
+               csv_data.drop_duplicates(keep='first',inplace=True)
+               csv_data['eventDate'] = pd.to_datetime(csv_data['eventDate'], format='%Y%m%d', errors='coerce')
+               csv_data = csv_data[csv_data['eventDate'] <= pd.Timestamp('2023-03-15')]
+               csv_data.to_csv(csv_file_path,mode='a',index=False,header=False)
+               # chunks.append(csv_data)
+            else:
+               df = pd.read_csv(path,
+                                 header=None,
+                                 names=camel_case_columns,
+                                 usecols=camel_case_columns_to_select,
+                                 chunksize=chunk_size,
+                                 on_bad_lines='skip',
+                                 # quoting=csv.QUOTE_NONE, #https://stackoverflow.com/questions/18016037/pandas-parsererror-eof-character-when-reading-multiple-csv-files-to-hdf5 
+                                 encoding='utf-8')
+               for chunk in df:
+                  chunk.drop_duplicates(keep='first',inplace=True)
+                  chunk['eventDate'] = pd.to_datetime(chunk['eventDate'], format='%Y%m%d', errors='coerce')
+                  chunk = chunk.loc[chunk['eventDate'] <= '2023-03-15']
+                  chunk.to_csv(csv_file_path,mode='a',index=False)
+                  # chunks.append(chunk)
+            break
          except pd.errors.ParserError as e:
             logging.exception(f'Error reading CSV file on path : {path}')
-   processed_data = pd.concat(chunks, ignore_index=True)
-   processed_data.to_csv(csv_file_path,index=False)
+            tries+=1
+            time.sleep(5)
+            if tries == max_tries:
+                    logging.error(f"Reached maximum tries ({max_tries}) for file: {path}")
+   # processed_data = pd.concat(chunks, ignore_index=True)
+   # processed_data.to_csv(csv_file_path,index=False)
    
 def main():
    csv_file_path,data_folder = _parse_arguments()
    file_paths = search_dir(directory_path=data_folder)
-   merge_data(file_paths[0:3],csv_file_path)
+   merge_data(file_paths,csv_file_path)
    return 
 
 if __name__ == "__main__":
