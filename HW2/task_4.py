@@ -7,7 +7,6 @@ from tqdm import tqdm
 import re
 import numpy as np
 import time
-import sys
 
 def camel_case(s):
     #taken from https://www.w3resource.com/python-exercises/string/python-data-type-string-exercise-96.php
@@ -15,6 +14,7 @@ def camel_case(s):
     return ''.join([s[0].lower(), s[1:]])
  
 def get_camel_column_names():
+   """" Returns a list of column names in camel case +  list of column names to select from csv files"""
    column_names = ['event_date', 'event_timestamp', 'event_name', 'user_pseudo_id', 'geo_country', 
                    'app_info_version', 'platform', 'firebase_experiments', 'id', 'item_name', 
                    'previous_first_open_count', 'name', 'event_id', 'status' 
@@ -22,6 +22,7 @@ def get_camel_column_names():
    camel_case_columns = [camel_case(column) for column in column_names]
    columns_to_select = ["event_date", "event_name", "user_pseudo_id", "platform", "status", "geo_country", "id"]
    camel_case_columns_to_select = [camel_case(column) for column in columns_to_select]
+   
    return camel_case_columns, camel_case_columns_to_select
 
 def _parse_arguments():
@@ -54,7 +55,7 @@ def merge_data(file_paths,csv_file_path,max_file_size = 1000000000,chunk_size=10
       while tries < max_tries:
          try:
             if os.stat(path).st_size < max_file_size:
-               print(f" Checked {path}")
+               logging.info(f" Checked {path}")
                csv_data = pd.read_csv(path,
                                  header=None,
                                  names=camel_case_columns,
@@ -91,6 +92,8 @@ def merge_data(file_paths,csv_file_path,max_file_size = 1000000000,chunk_size=10
             time.sleep(5)
             if tries == max_tries:
                     logging.error(f"Reached maximum tries ({max_tries}) for file: {path}")
+                    
+   #comment :  option to append each csv file and csv chunk was due to memory issue (my working memory coudnt handle the size of array crated by appending chunks)
    # processed_data = pd.concat(chunks, ignore_index=True)
    # processed_data.to_csv(csv_file_path,index=False)
    
@@ -103,3 +106,4 @@ def main():
 if __name__ == "__main__":
    main()
    # EXAMPLE USAGE : python task_4.py --csv_save_path './raw_data/processed_data.csv' --data_folder './raw_data'
+
