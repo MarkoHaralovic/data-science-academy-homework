@@ -6,6 +6,7 @@ import logging
 import argparse
 import time
 import sys
+import re
 
 def printTotals(transferred, toBeTransferred):
     print(f"Transferred: {transferred}\tOut of: {toBeTransferred}")
@@ -17,9 +18,19 @@ def parse_arguments():
    args = parser.parse_args()
    return args.file_save_path, args.remote_file_path
 
-def create_dir(file_save_dir):
-   if not os.path.exists(file_save_dir):
-      os.makedirs(file_save_dir)
+def search_dir(directory_path,extension):
+    file_paths = []
+    if os.path.exists(directory_path):
+        for root, _, files in os.walk(directory_path):
+            for file in files:
+                if file.endswith(extension):
+                    full_path = os.path.join(root, file).replace('\\', '/')
+                    file_paths.append(full_path)
+    return file_paths
+
+def create_dir(dir):
+   if not os.path.exists(dir):
+      os.makedirs(dir)
       
 def unzip_file(local_file_path,save_path):
    try:
@@ -75,3 +86,8 @@ def ssh_download_data_from_dir(remote_folder,local_folder):
             local_file_path = os.path.join(local_folder, file)
             ssh_download_data(remote_file_path, local_file_path, max_tries=3)
             unzip_file(local_file_path, local_folder)
+            
+def camel_case(s):
+    #taken from https://www.w3resource.com/python-exercises/string/python-data-type-string-exercise-96.php
+    s = re.sub(r"(_|-)+", " ", s).title().replace(" ", "")
+    return ''.join([s[0].lower(), s[1:]])
