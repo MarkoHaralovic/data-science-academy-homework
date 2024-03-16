@@ -75,6 +75,10 @@ def merge_data(file_paths,csv_file_path,max_file_size = 1000000000,chunk_size=10
                                  #quoting = csv.QUOTE_NONE,#https://stackoverflow.com/questions/18016037/pandas-parsererror-eof-character-when-reading-multiple-csv-files-to-hdf5 
                                  encoding='utf-8',
                                  low_memory=False)
+                                 #added low meemory since i got warning for column types. I didn't send dtypes here due to inability to read id as int + eventDate would be string later turned to datetime
+                                 #on link https://towardsdatascience.com/%EF%B8%8F-load-the-same-csv-file-10x-times-faster-and-with-10x-less-memory-%EF%B8%8F-e93b485086c7
+                                 # there was suggestion :"by defining correct dtypes we can reduce memory usage significantly."
+                                 # I did and still got memory error described below.If converted after reading, script time prolongs.
 
                csv_data.drop_duplicates(keep='first',inplace=True)
                csv_data['eventDate'] = pd.to_datetime(csv_data['eventDate'], format='%Y%m%d', errors='coerce')
