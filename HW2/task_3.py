@@ -8,9 +8,9 @@ import sys
 
 from helper_functions import create_dir,parse_arguments,unzip_file,ssh_download_data,ssh_download_data_from_dir
 
+logging.basicConfig(level=logging.INFO)  
          
 def main():
-   logging.basicConfig(level=logging.INFO)
    #get paths from cmd line
    save_path, remote_file_path = parse_arguments()
    #create dir where data will be saved

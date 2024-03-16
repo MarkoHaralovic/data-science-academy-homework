@@ -7,9 +7,10 @@ import time
 import sys
 
 from helper_functions import printTotals,parse_arguments,create_dir,unzip_file,ssh_download_data 
-       
+
+logging.basicConfig(level=logging.INFO)  
+
 def main():
-   logging.basicConfig(level=logging.INFO)
    #get paths from cmd line
    save_path, remote_file_path = parse_arguments()
    #create directory based on provided path (where the person wish to save the data)

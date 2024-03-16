@@ -10,7 +10,9 @@ import time
 import sys
 
 from helper_functions  import search_dir, camel_case
- 
+
+logging.basicConfig(level=logging.INFO)  
+
 def get_camel_column_names():
    """" Returns a list of column names in camel case +  list of column names to select from csv files"""
    #these column names have been taken from the database documentation
