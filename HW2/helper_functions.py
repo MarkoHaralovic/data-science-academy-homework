@@ -70,22 +70,36 @@ def ssh_download_data(remote_file_path, local_file_path, max_tries=3):
    logging.error(f"Reached maximum tries ({max_tries})")
    sys.exit(1)
       
-def ssh_download_data_from_dir(remote_folder,local_folder):
-   with paramiko.SSHClient() as ssh:
-      ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-      ssh.connect('130.61.238.15', username='sofascore_academy', password='H69qByfVGwkLgezF')
-      command = f'ls -l {remote_folder}'
-      _, stdout, _ = ssh.exec_command(command)
-      for line in stdout:
-         print(line)
-         file = line.strip()
-         file = file.split(" ")[-1]
-         print(file)
-         if file.endswith('.zip'):
-            remote_file_path = os.path.join(remote_folder, file).replace('\\', '/')
-            local_file_path = os.path.join(local_folder, file)
-            ssh_download_data(remote_file_path, local_file_path, max_tries=3)
-            unzip_file(local_file_path, local_folder)
+def ssh_download_data_from_dir(remote_folder,local_folder,max_tries=3):
+   tries = 0
+   while tries < max_tries:
+      try:
+         with paramiko.SSHClient() as ssh:
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.connect('130.61.238.15', username='sofascore_academy', password='H69qByfVGwkLgezF')
+            command = f'ls -l {remote_folder}'
+            _, stdout, _ = ssh.exec_command(command)
+            for line in stdout:
+               print(line)
+               file = line.strip()
+               file = file.split(" ")[-1]
+               print(file)
+               if file.endswith('.zip'):
+                  remote_file_path = os.path.join(remote_folder, file).replace('\\', '/')
+                  local_file_path = os.path.join(local_folder, file)
+                  ssh_download_data(remote_file_path, local_file_path, max_tries=3)
+                  unzip_file(local_file_path, local_folder)
+         return
+      except FileNotFoundError as e:
+         logging.error(f"File does not exist  on remote  path : {remote_file_path}, try {tries +1}")
+         tries+=1
+         time.sleep(5)
+      except SSHException as e:
+         logging.error(f"Error connecting to host,try {tries +1}")
+         tries+=1
+         time.sleep(5)
+   logging.error(f"Reached maximum tries ({max_tries})")
+   sys.exit(1)
             
 def camel_case(s):
     #taken from https://www.w3resource.com/python-exercises/string/python-data-type-string-exercise-96.php
