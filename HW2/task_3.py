@@ -12,11 +12,11 @@ logging.basicConfig(level=logging.INFO)
          
 def main():
    #get paths from cmd line
-   save_path, remote_file_path = parse_arguments()
+   save_path, remote_file_path,keep_zip_file = parse_arguments()
    #create dir where data will be saved
    create_dir(save_path)
     # open ssh session and download data
-   ssh_download_data_from_dir(remote_file_path,save_path)
+   ssh_download_data_from_dir(remote_file_path,save_path,keep_zip=keep_zip_file)
    
 if __name__ == "__main__":
    main()

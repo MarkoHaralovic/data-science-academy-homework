@@ -13,10 +13,11 @@ def printTotals(transferred, toBeTransferred):
 
 def parse_arguments():
    parser = argparse.ArgumentParser()
-   parser.add_argument('--file_save_path',required=True, help='Putanja gdje se file lokalno sprema')
-   parser.add_argument('--remote_file_path', required= True, help='Putanja do remote datoteke koja se skida')
+   parser.add_argument('--file_save_path',required=True, help='Local path to save file to')
+   parser.add_argument('--remote_file_path', required=True, help='Path to remote file to save.')
+   parser.add_argument('--keep_zip_tar_file', action='store_true', help='Store/keep the zip/tar file downloaded from remote host')
    args = parser.parse_args()
-   return args.file_save_path, args.remote_file_path
+   return args.file_save_path, args.remote_file_path, args.keep_zip_tar_file
 
 def search_dir(directory_path,extension):
     file_paths = []
@@ -31,19 +32,24 @@ def search_dir(directory_path,extension):
 def create_dir(dir):
    if not os.path.exists(dir):
       os.makedirs(dir)
+   else:
+      logging.info('Directory already exists: %s' % dir)
       
-def unzip_file(local_file_path,save_path):
+def unzip_file(local_zip_file_path,save_path,keep_zip=True):
    try:
-      with ZipFile(local_file_path,'r') as zip_file:
+      logging.info('Extracting data to %s' % save_path)
+      with ZipFile(local_zip_file_path,'r') as zip_file:
          zip_file.extractall(path=save_path)  
+      os.remove(local_zip_file_path) if not keep_zip else None
    except BadZipFile as e:
-      logging.error(f"Error unzipping file on path {local_file_path}")
+      logging.error(f"Error unzipping file on path {local_zip_file_path}")
 
-def open_tar_file(local_file_path, save_path):
+def open_tar_file(local_file_path, save_path,keep_tar_file=True):
     if tarfile.is_tarfile(local_file_path):
         try:
             with tarfile.open(local_file_path, 'r:gz') as tar:
                 tar.extractall(path=save_path)
+            os.remove(local_file_path) if not keep_tar_file else None
         except Exception as e: 
             logging.error(f"There was a problem extracting tar file from location {local_file_path}: {e}")
     else:
@@ -70,7 +76,7 @@ def ssh_download_data(remote_file_path, local_file_path, max_tries=3):
    logging.error(f"Reached maximum tries ({max_tries})")
    sys.exit(1)
       
-def ssh_download_data_from_dir(remote_folder,local_folder,max_tries=3):
+def ssh_download_data_from_dir(remote_folder,local_folder,max_tries=3,keep_zip=True):
    tries = 0
    while tries < max_tries:
       try:
@@ -80,15 +86,19 @@ def ssh_download_data_from_dir(remote_folder,local_folder,max_tries=3):
             command = f'ls -l {remote_folder}'
             _, stdout, _ = ssh.exec_command(command)
             for line in stdout:
-               print(line)
                file = line.strip()
                file = file.split(" ")[-1]
-               print(file)
+                              
                if file.endswith('.zip'):
                   remote_file_path = os.path.join(remote_folder, file).replace('\\', '/')
                   local_file_path = os.path.join(local_folder, file)
                   ssh_download_data(remote_file_path, local_file_path, max_tries=3)
-                  unzip_file(local_file_path, local_folder)
+                  unzip_file(local_file_path, local_folder,keep_zip=keep_zip)
+               elif file.endswith('.csv'):
+                  logging.info(file)
+                  remote_file_path = os.path.join(remote_folder, file).replace('\\', '/')
+                  local_file_path = os.path.join(local_folder, file)
+                  ssh_download_data(remote_file_path, local_file_path, max_tries=3)                  
          return
       except FileNotFoundError as e:
          logging.error(f"File does not exist  on remote  path : {remote_file_path}, try {tries +1}")
