@@ -13,9 +13,14 @@ def printTotals(transferred, toBeTransferred):
 
 def parse_arguments():
    parser = argparse.ArgumentParser()
-   parser.add_argument('--file_save_path',required=True, help='Local path to save file to')
-   parser.add_argument('--remote_file_path', required=True, help='Path to remote file to save.')
+  
+   required_arguments = parser.add_argument_group('Required arguments')
+   required_arguments .add_argument('--file_save_path',required=True, help='Local path to save file to')
+   required_arguments .add_argument('--remote_file_path', required=True, help='Path to remote file to save.')
+   
+   parser._optionals.title = 'Optional arguments'
    parser.add_argument('--keep_zip_tar_file', action='store_true', help='Store/keep the zip/tar file downloaded from remote host')
+   
    args = parser.parse_args()
    return args.file_save_path, args.remote_file_path, args.keep_zip_tar_file
 
@@ -29,11 +34,15 @@ def search_dir(directory_path,extension):
                     file_paths.append(full_path)
     return file_paths
 
-def create_dir(dir):
+def create_dir(dir,overwrite=True):
    if not os.path.exists(dir):
       os.makedirs(dir)
+   elif os.path.exists(dir) and not overwrite:
+      logging.error('Directory already exists: %s, define different directory to save data to' % dir)
+      sys.exit(1)
    else:
-      logging.info('Directory already exists: %s' % dir)
+      logging.info('Overwriting directory %s' % dir)
+           
       
 def unzip_file(local_zip_file_path,save_path,keep_zip=True):
    try:
