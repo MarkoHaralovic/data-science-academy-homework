@@ -73,3 +73,13 @@ Since entrypoint is python, to run container in interactive mode, with perhaps b
 ```bash
    docker-compose run --entrypoint /bin/bash -it production-code
 ```
+
+## Commentary :  differences between development and production mode
+
+I will enumerate differences:
+   1. production Dockerfile has multi.stage build, ensuring copying only necessary libraries into lighter python image, resulting in lighter image size.
+   2. production Dockerfile copies more specifically files, whereas development Dockerfile would collect all files in the dev dir
+   3. production docker-compose.yaml is lightweight, while development one defines 3 different services (three isloated containers running one task each), ports are bind to local ports from docker container, data is stored locally as well for each task
+   4.log-level is set to DEBUG in development mode, and to WARNING in production mode (more verbose logging in the development mode)
+   5. zip/tar files downloaded from remote host are saved in development mode
+
