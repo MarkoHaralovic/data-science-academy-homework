@@ -30,9 +30,9 @@ C:.
    - **PASSWORD**
 
 #### Commentary on .env
-Since I have only one triplet of those, .env file looks the same in the production environment, but in scenario where certain user could only have limited functionality, it would make sense to distinguish between .env files, or if we would have a smaller database for development phase.
+Since I have only one triplet of those, .env file looks the same in the production environment, but in scenario where certain user could only have limited functionality, or if we would have a smaller database for development phase,it would make sense to distinguish between .env files
 
-- **config.json**: used as replacement for command line arguments needed for each python script. If user sends ----config_file and --task, the script reads the configuration for the specific task. Therefore, this json contains defualt configuration, both common and task specific, which enables us to run the tasks with lesser number of command line arguments, which will be shown later in the file.
+- **config.json**: used as replacement for command line arguments needed for each python script. If user sends --config_file and --task, the script reads the configuration for the specific task. Therefore, this json contains default configuration, both common and task specific, which enables us to run the tasks with lesser number of command line arguments, which will be shown later in the file.
 
 ## Dockerfile
  Dockerfile is used for building the docker image that will be used by containers that will run the tasks. 
@@ -58,6 +58,7 @@ I did that to isolate tasks. Each container runs in isolation, ensuring that dep
 
 ## Default commands 
 Defualt commands are defined in the docker-compose.yaml, where after running docker-compose build, each task can be run using commands:
+
 ```bash
    docker-compose run task1
    docker-compose run task2
