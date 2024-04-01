@@ -1,15 +1,23 @@
-FROM python:3.11.8
+FROM python:3.11.8 AS builder
 
 WORKDIR /app
 
 COPY requirements.txt .
-# --no-cache-dir -> do not cache downloads when installing a package
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src /app
 
-# Make the scripts in the src directory executable
+# Making the scripts in the src directory executable
 RUN chmod +x /app/*.py
 
-#ENTRYPOINT also allows you to pass arguments at runtime to customize the container’s behavior.
+FROM python:3.11.8-slim
+
+WORKDIR /app
+
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+
+COPY --from=builder /app /app
+COPY config.json /app
+
+# Set the entrypoint
 ENTRYPOINT [ "python" ]

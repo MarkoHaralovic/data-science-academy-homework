@@ -10,7 +10,7 @@ COPY . /app
 RUN rm -rf src
 COPY src /app
 
-# Make the scripts in the src directory executable
+# Making the scripts in the src directory executable
 RUN chmod +x /app/*.py
 
 #ENTRYPOINT also allows you to pass arguments at runtime to customize the container’s behavior.
