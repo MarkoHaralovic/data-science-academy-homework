@@ -1,0 +1,6 @@
+.*
+README.md
+Dockerfile
+docker-compose.yaml
+**/__pycache__
+

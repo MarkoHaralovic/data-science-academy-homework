@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  task1:
+    build: .
+    command: ["task_1.py", "--task", "task_1", "--config_file", "config.json"]  
+    ports:
+      - "8005:8000"
+    volumes:
+      - ./data/task1:/app/data
+    env_file:
+      - .env
+    container_name:  task1-dev
+
+  task2:
+    build: .
+    command: ["task_2.py", "--task", "task_2", "--config_file", "config.json"]  
+    ports:
+      - "8006:8000"
+    env_file:
+      - .env
+    container_name:  task2-dev
+
+  task3:
+    build: .
+    command: ["task_3.py", "--task", "task_3", "--config_file", "config.json"]  
+    ports:
+      - "8007:8000"
+    env_file:
+      - .env
+    container_name:  task3-dev

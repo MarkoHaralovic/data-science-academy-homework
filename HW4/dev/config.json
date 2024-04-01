@@ -1,0 +1,21 @@
+{
+    "common": {
+        "keep_zip_tar_file": "True",
+        "max_tries": 3,
+        "retry_delay": 5,
+        "log-level": "DEBUG",
+        "overwrite": "True"
+    },
+    "task_1": {
+        "file_save_path": "./data/january-small.csv.zip",
+        "remote_file_path": "/home/sofascore_academy/l2_dataset/january-small.csv.zip"
+    },
+    "task_2": {
+        "file_save_path": "./data/february-small.tar.gz",
+        "remote_file_path": "/home/sofascore_academy/l2_dataset/february-small.tar.gz"
+    },
+    "task_3": {
+        "file_save_path": "./data/march-small",
+        "remote_file_path": "/home/sofascore_academy/l2_dataset/march-small"
+    }
+}
