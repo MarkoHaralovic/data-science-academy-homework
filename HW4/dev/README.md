@@ -1,6 +1,8 @@
 # Development Mode Implementation README for HW4
 This is description of my vision and it's implementation of the development mode for the code from HW2. 
 
+POSSIBLE IMPROVEMENT: Add Python linter in the Dockerfile.
+
 ## Project structure overview
 Directory is structured as follows:
 ```
